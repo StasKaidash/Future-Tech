@@ -4,6 +4,7 @@ import VideoPlayerCollection from './VideoPlayer.js'
 import ExpandableContentCollection from './ExpandableContent.js'
 import InputMaskCollection from './inputMask.js'
 import SelectCollection from './Select.js'
+import TldrButtonCollection from './TldrButton.js'
 
 
 new Header()
@@ -12,3 +13,4 @@ new VideoPlayerCollection()
 new ExpandableContentCollection ()
 new InputMaskCollection ()
 new SelectCollection ()
+new TldrButtonCollection ()

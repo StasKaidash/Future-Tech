@@ -1,6 +1,26 @@
-# Include your project-specific ignores in this file
-# Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
-# Useful .gitignore templates: https://github.com/github/gitignore
-../node_modules
-dist
-.cache
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.cache/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Netlify CLI local state
+.netlify/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Legacy scaffolding leftovers (kept on disk, not tracked)
+future1tech/
+src/
