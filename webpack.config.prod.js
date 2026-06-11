@@ -15,7 +15,6 @@ module.exports = merge(common, {
         { from: 'styles/main.css', to: 'styles/main.css' },
         { from: 'styles/main.css.map', to: 'styles/main.css.map', noErrorOnMissing: true },
         { from: 'js/vendor', to: 'js/vendor' },
-        { from: 'js/main.js', to: 'js/main.js' },
         { from: 'fonts', to: 'fonts', noErrorOnMissing: true },
         { from: 'icon.svg', to: 'icon.svg' },
         { from: 'favicon.ico', to: 'favicon.ico' },
