@@ -1,7 +1,7 @@
 const rootSelector = '[data-js-tldr-button]'
 const PANEL_ID = 'tldrPanelRoot'
 
-const TLDR_ENDPOINT = '/.netlify/functions/tldr'
+const TLDR_ENDPOINT = '/api/tldr'
 const MAX_CONTENT_LENGTH = 50000
 
 class TldrButton {
