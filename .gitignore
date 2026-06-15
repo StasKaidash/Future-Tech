@@ -13,6 +13,12 @@ dist/
 # Netlify CLI local state
 .netlify/
 
+# Vercel CLI local state
+.vercel/
+
+# Temp/intermediate files (smoke harnesses, scratch)
+.tmp/
+
 # IDE
 .idea/
 .vscode/

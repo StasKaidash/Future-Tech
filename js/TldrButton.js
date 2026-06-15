@@ -68,7 +68,7 @@ class TldrButton {
         } catch (networkErr) {
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                 throw new Error(
-                    "Run 'netlify dev' to test the AI feature locally — 'npm start' does not host Netlify Functions."
+                    "Run 'vercel dev' to test the AI feature locally — 'npm start' does not host serverless functions."
                 )
             }
             throw new Error('Network error — check your connection.')
@@ -143,7 +143,7 @@ class TldrPanel {
                 </header>
                 <div class="tldr-panel__content" data-js-tldr-panel-content></div>
                 <footer class="tldr-panel__footer">
-                    <small>Powered by Claude Haiku 4.5</small>
+                    <small>Powered by Claude Sonnet 4.6</small>
                 </footer>
             </aside>
         `

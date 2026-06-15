@@ -2,7 +2,7 @@
 // Keeps the API key server-side. Called by js/TldrButton.js.
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
-const MODEL = 'claude-haiku-4-5-20251001'
+const MODEL = 'claude-sonnet-4-6'
 const MAX_TOKENS = 500
 const MAX_CONTENT_LENGTH = 50000
 const FETCH_TIMEOUT_MS = 25000
