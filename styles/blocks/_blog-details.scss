@@ -4,7 +4,8 @@
 
   &__banner {
     display: flex;
-    align-items: end;
+    align-items: center;
+    justify-content: center;
     min-height: fluid(598, 281);
     padding-block: fluid(65, 17);
     text-align: center;
