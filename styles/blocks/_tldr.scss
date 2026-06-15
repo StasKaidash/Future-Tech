@@ -205,6 +205,20 @@
     }
   }
 
+  &__demo-badge {
+    display: inline-block;
+    margin: 0 0 rem(14);
+    padding: rem(4) rem(10);
+    font-size: rem(11);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-gray-60);
+    background-color: rgba(255, 209, 26, 0.08);
+    border: rem(1) solid rgba(255, 209, 26, 0.35);
+    border-radius: rem(999);
+  }
+
   &__subtitle {
     margin: 0 0 rem(16);
     font-size: rem(14);

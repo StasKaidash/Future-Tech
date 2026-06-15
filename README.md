@@ -29,6 +29,7 @@ On `blog.html`, the **✦ TL;DR — AI Summary** button next to the article titl
 - **Function code:** [`api/tldr.js`](api/tldr.js) — Vercel serverless handler (CommonJS)
 - **Frontend caller:** [`js/TldrButton.js`](js/TldrButton.js) — `POST /api/tldr` with `{ title, content }`
 - **Security:** `ANTHROPIC_API_KEY` lives only in Vercel env vars — never shipped to the browser. Server-side input validation (≤ 50 000 chars), 25 s upstream timeout, sanitized error responses.
+- **Graceful degradation:** when upstream returns credit/quota/auth errors (or the key is unset), the endpoint serves a labeled demo response with a visible "Demo response" badge so the feature stays demonstrable while staying honest about the failure mode.
 
 ### Flow
 

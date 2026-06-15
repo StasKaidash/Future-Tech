@@ -4,6 +4,14 @@ const PANEL_ID = 'tldrPanelRoot'
 const TLDR_ENDPOINT = '/api/tldr'
 const MAX_CONTENT_LENGTH = 50000
 
+const DEMO_REASON_LABELS = {
+    api_budget_exhausted: 'Demo response · API budget exhausted',
+    missing_key: 'Demo response · API key not configured',
+    invalid_key: 'Demo response · API key not configured',
+    rate_limited: 'Demo response · Rate limited by upstream',
+    forced: 'Demo response · Forced demo mode',
+}
+
 class TldrButton {
     selectors = {
         root: rootSelector,
@@ -47,8 +55,8 @@ class TldrButton {
         this.buttonElement.setAttribute('disabled', '')
 
         try {
-            const summary = await this.requestSummary({ title, content })
-            panel.setResult(title, summary)
+            const result = await this.requestSummary({ title, content })
+            panel.setResult(title, result.summary, result.demoLabel)
         } catch (err) {
             panel.setError('Could not generate summary', err.message || String(err))
         } finally {
@@ -90,7 +98,11 @@ class TldrButton {
         if (!summary) {
             throw new Error('Failed to generate summary. Try again later.')
         }
-        return summary
+        const demoLabel =
+            data && data.demo === true
+                ? DEMO_REASON_LABELS[data.reason] || 'Demo response'
+                : null
+        return { summary, demoLabel }
     }
 }
 
@@ -170,7 +182,7 @@ class TldrPanel {
         `
     }
 
-    setResult(title, summary) {
+    setResult(title, summary, demoLabel = null) {
         const safeTitle = this.escape(title)
         // Server returns prose (3-5 sentences). Split into sentences so each renders
         // as its own bullet, keeping the existing visual style.
@@ -182,9 +194,16 @@ class TldrPanel {
         const bullets = sentences
             .map((s) => `<li>${this.escape(s.replace(/^[•\-\*]\s*/, ''))}</li>`)
             .join('')
+        const badge = demoLabel
+            ? `<p class="tldr-panel__demo-badge" role="note" aria-label="${this.escape(demoLabel)}">${this.escape(demoLabel)}</p>`
+            : ''
+        const demoAttr = demoLabel ? ' data-demo="true"' : ''
         this.contentEl.innerHTML = `
-            <p class="tldr-panel__subtitle">${safeTitle}</p>
-            <ul class="tldr-panel__bullets">${bullets}</ul>
+            <div class="tldr-panel__result"${demoAttr}>
+                ${badge}
+                <p class="tldr-panel__subtitle">${safeTitle}</p>
+                <ul class="tldr-panel__bullets">${bullets}</ul>
+            </div>
         `
     }
 

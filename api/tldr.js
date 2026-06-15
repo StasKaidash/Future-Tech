@@ -1,11 +1,51 @@
 // Vercel API route: proxy to Anthropic Messages API.
 // Keeps the API key server-side. Called by js/TldrButton.js.
+//
+// Graceful degradation: when the upstream is unreachable, unauthorized,
+// rate-limited or out of credit (or the key isn't configured at all), the
+// handler still returns 200 with a labeled demo summary so the feature stays
+// demonstrable. The frontend renders a visible "Demo response" badge.
 
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages'
 const MODEL = 'claude-sonnet-4-6'
 const MAX_TOKENS = 500
 const MAX_CONTENT_LENGTH = 50000
 const FETCH_TIMEOUT_MS = 25000
+const DEMO_SOURCE_LIMIT = 600
+
+function getDegradeReason({ apiKey, upstreamStatus, upstreamDetail }) {
+    if (process.env.FORCE_DEMO === '1') return 'forced'
+    if (!apiKey) return 'missing_key'
+    if (upstreamStatus === 401) return 'invalid_key'
+    if (upstreamStatus === 429) return 'rate_limited'
+    if (
+        upstreamStatus === 400 &&
+        typeof upstreamDetail === 'string' &&
+        upstreamDetail.toLowerCase().includes('credit balance is too low')
+    ) {
+        return 'api_budget_exhausted'
+    }
+    return null
+}
+
+function buildDemoSummary(content) {
+    const snippet = (content || '').slice(0, DEMO_SOURCE_LIMIT).trim()
+    if (!snippet) {
+        return 'Demo response — the AI service is currently unavailable.'
+    }
+    const sentences = snippet
+        .split(/(?<=[.!?])\s+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+    if (sentences.length === 0) return snippet
+    return sentences.slice(0, 3).join(' ')
+}
+
+function respondDemo(res, content, reason) {
+    const summary = buildDemoSummary(content)
+    console.warn(`[tldr] demo_fallback reason=${reason} length=${summary.length}`)
+    return res.status(200).json({ summary, demo: true, reason, model: 'demo' })
+}
 
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -34,9 +74,11 @@ module.exports = async function handler(req, res) {
     }
 
     const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-        console.error('[tldr] ANTHROPIC_API_KEY env variable is not set')
-        return res.status(500).json({ error: 'Server not configured' })
+
+    // Pre-flight degrade: forced demo, or key not configured at all.
+    const preDegrade = getDegradeReason({ apiKey, upstreamStatus: null, upstreamDetail: null })
+    if (preDegrade) {
+        return respondDemo(res, content, preDegrade)
     }
 
     const prompt =
@@ -87,11 +129,13 @@ module.exports = async function handler(req, res) {
         }
         console.error('[tldr] upstream error', upstream.status, detail)
 
-        if (upstream.status === 401) {
-            return res.status(500).json({ error: 'Server auth error' })
-        }
-        if (upstream.status === 429) {
-            return res.status(429).json({ error: 'Rate limit, try again later' })
+        const reason = getDegradeReason({
+            apiKey,
+            upstreamStatus: upstream.status,
+            upstreamDetail: detail,
+        })
+        if (reason) {
+            return respondDemo(res, content, reason)
         }
         return res.status(502).json({ error: 'AI service error' })
     }
